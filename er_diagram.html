@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MedSafe AI — Entity Relationship Diagram</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #080c14;
+      --surface: #0f1623;
+      --border: #1e2d4a;
+      --text: #e2eaf8;
+      --muted: #6b80a0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: auto;
+    }
+    .page-header {
+      padding: 28px 40px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, #0f1623 0%, #111827 100%);
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+    .page-header h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #60a5fa, #a78bfa, #34d399);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .page-header p { font-size: .8rem; color: var(--muted); margin-top: 4px; }
+    .legend {
+      display: flex;
+      gap: 20px;
+      background: #0f1623;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-size: .75rem;
+      flex-wrap: wrap;
+    }
+    .legend-item { display: flex; align-items: center; gap: 7px; }
+
+    .canvas-wrap { position: relative; overflow: auto; padding: 30px; }
+    .canvas { position: relative; width: 1600px; height: 1060px; }
+
+    #svg-lines {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none; z-index: 0;
+    }
+
+    .entity {
+      position: absolute;
+      border-radius: 12px;
+      border: 1.5px solid transparent;
+      background: var(--surface);
+      box-shadow: 0 4px 24px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.04);
+      z-index: 10;
+      transition: transform .2s ease, box-shadow .2s ease;
+      min-width: 210px;
+      cursor: default;
+    }
+    .entity:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 36px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.08);
+      z-index: 20;
+    }
+    .entity-header {
+      padding: 10px 14px;
+      border-radius: 10px 10px 0 0;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .entity-header .icon { font-size: 1rem; }
+    .entity-header h3 {
+      font-size: .8rem; font-weight: 700;
+      letter-spacing: .5px; text-transform: uppercase; color: #fff;
+    }
+    .entity-attrs { padding: 8px 0; border-top: 1px solid rgba(255,255,255,.07); }
+    .attr {
+      display: flex; align-items: center; gap: 6px;
+      padding: 4px 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .7rem; color: #c8d6f0;
+      transition: background .15s;
+    }
+    .attr:hover { background: rgba(255,255,255,.04); }
+    .badge {
+      font-size: .58rem; font-weight: 700;
+      padding: 1px 5px; border-radius: 4px; letter-spacing: .4px;
+    }
+    .badge-pk { background: #facc1522; color: #facc15; border: 1px solid #facc1540; }
+    .badge-fk { background: #94a3b822; color: #94a3b8; border: 1px solid #94a3b840; }
+    .attr-pk { font-weight: 700; color: #fde68a; text-decoration: underline; text-underline-offset: 3px; }
+    .attr-fk { color: #93c5fd; font-style: italic; }
+
+    .e-blue   { border-color: #3b82f6; } .e-blue   .entity-header { background: linear-gradient(135deg,#1d4ed822,#3b82f633); }
+    .e-purple { border-color: #8b5cf6; } .e-purple .entity-header { background: linear-gradient(135deg,#5b21b622,#8b5cf633); }
+    .e-teal   { border-color: #14b8a6; } .e-teal   .entity-header { background: linear-gradient(135deg,#0f766e22,#14b8a633); }
+    .e-green  { border-color: #22c55e; } .e-green  .entity-header { background: linear-gradient(135deg,#15803d22,#22c55e33); }
+    .e-orange { border-color: #f97316; } .e-orange .entity-header { background: linear-gradient(135deg,#c2410c22,#f9731633); }
+    .e-yellow { border-color: #eab308; } .e-yellow .entity-header { background: linear-gradient(135deg,#a1620022,#eab30833); }
+    .e-red    { border-color: #ef4444; } .e-red    .entity-header { background: linear-gradient(135deg,#b91c1c22,#ef444433); }
+    .e-pink   { border-color: #ec4899; } .e-pink   .entity-header { background: linear-gradient(135deg,#be185d22,#ec489933); }
+    .e-cyan   { border-color: #06b6d4; } .e-cyan   .entity-header { background: linear-gradient(135deg,#0e749122,#06b6d433); }
+    .e-lime   { border-color: #84cc16; } .e-lime   .entity-header { background: linear-gradient(135deg,#4d7c0f22,#84cc1633); }
+
+    .tooltip {
+      position: fixed;
+      background: #1e2d4a;
+      border: 1px solid #2e4060;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: .75rem;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .2s;
+      z-index: 999;
+      max-width: 220px;
+    }
+    .tooltip h4 { color: #fff; margin-bottom: 6px; font-size: .78rem; }
+    .tooltip p  { color: var(--muted); line-height: 1.5; }
+
+    .page-footer {
+      text-align: center; padding: 18px;
+      font-size: .72rem; color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<header class="page-header">
+  <div>
+    <h1>🏥 MedSafe AI — Entity Relationship Diagram</h1>
+    <p>Normalized data model &nbsp;·&nbsp; 10 entities &nbsp;·&nbsp; 1:N relationships &nbsp;·&nbsp; Crow's Foot Notation</p>
+  </div>
+  <div class="legend">
+    <div class="legend-item">
+      <span style="font-size:.7rem;background:#facc1522;color:#facc15;border:1px solid #facc1540;padding:1px 5px;border-radius:4px;font-weight:700;">PK</span>
+      <span>Primary Key</span>
+    </div>
+    <div class="legend-item">
+      <span style="font-size:.7rem;background:#94a3b822;color:#94a3b8;border:1px solid #94a3b840;padding:1px 5px;border-radius:4px;font-weight:700;">FK</span>
+      <span>Foreign Key</span>
+    </div>
+    <div class="legend-item">
+      <svg width="46" height="14">
+        <line x1="0" y1="7" x2="46" y2="7" stroke="#60a5fa" stroke-width="1.5" stroke-dasharray="4,2"/>
+      </svg>
+      <span>1 : Many relationship</span>
+    </div>
+    <div class="legend-item">
+      <svg width="14" height="14">
+        <line x1="7" y1="7" x2="14" y2="2" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="7" y1="7" x2="14" y2="12" stroke="#94a3b8" stroke-width="1.5"/>
+      </svg>
+      <span>Crow's foot (Many)</span>
+    </div>
+  </div>
+</header>
+
+<div class="canvas-wrap">
+  <div class="canvas" id="canvas">
+
+    <svg id="svg-lines" xmlns="http://www.w3.org/2000/svg"></svg>
+
+    <!-- 1. User Profile -->
+    <div class="entity e-blue" id="e-userprofile" style="left:640px;top:30px;">
+      <div class="entity-header"><span class="icon">👤</span><h3>User Profile</h3></div>
+      <div class="entity-attrs">
+        <div class="attr attr-pk"><span class="badge badge-pk">PK</span>UserID</div>
+        <div class="attr">Name</div>
+        <div class="attr">Age</div>
+        <div class="attr">Gender</div>
+        <div class="attr">MedicalHistory</div>
+      </div>
+    </div>
+
+    <!-- 2. User Session -->
+    <div class="entity e-purple" id="e-usersession" style="left:620px;top:330px;">
+      <div class="entity-header"><span class="icon">🔗</span><h3>User Session</h3></div>
+      <div class="entity-attrs">
+        <div class="attr attr-pk"><span class="badge badge-pk">PK</span>SessionID</div>
+        <div class="attr attr-fk"><span class="badge badge-fk">FK</span>UserID</div>
+        <div class="attr">SessionStartTime</div>
+        <div class="attr">Purpose</div>
+      </div>
+    </div>
+
+    <!-- 3. Prescription OCR -->
+    <div class="entity e-teal" id="e-prescriptionocr" style="left:40px;top:30px;">
+      <div class="entity-header"><span class="icon">📄</span><h3>Prescription OCR</h3></div>
+      <div class="entity-attrs">
+        <div class="attr attr-pk"><span class="badge badge-pk">PK</span>PrescriptionID</div>
+        <div class="attr attr-fk"><span class="badge badge-fk">FK</span>UserID</div>
+        <div class="attr">ExtractedText</div>
+        <div class="attr">ParsedData</div>
+      </div>
+    </div>
+
+    <!-- 4. Medicine Item -->
+    <div class="entity e-green" id="e-medicineitem" style="left:1230px;top:30px;">
+      <div class="entity-header"><span class="icon">💊</span><h3>Medicine Item</h3></div>
+      <div class="entity-attrs">
+        <div class="attr attr-pk"><span class="badge badge-pk">PK</span>MedicineID</div>
+        <div class="attr">MedicineName</div>
+        <div class="attr">DrugSalt</div>
+        <div class="attr">Category</div>
+      </div>
+    </div>
+
+    <!-- 5. Interaction Check -->
+    <div class="entity e-orange" id="e-interactioncheck" style="left:40px;top:420px;">
+      <div class="entity-header"><span class="icon">⚠️</span><h3>Interaction Check</h3></div>
+      <div class="entity-attrs">
+        <div class="attr attr-pk"><span class="badge badge-pk">PK</span>InteractionID</div>
+        <div class="attr attr-fk"><span class="badge badge-fk">FK</span>SessionID</div>
+        <div class="attr attr-fk"><span class="badge badge-fk">FK</span>MedicineID_1</div>
+        <div class="attr attr-fk"><span class="badge badge-fk">FK</span>MedicineID_2</div>
+        <div class="attr">InteractionLevel</div>
+      </div>
+    </div>
+
+    <!-- 6. Symptom Input -->
+    <div class="entity e-yellow" id="e-symptominput" style="left:1200px;top:330px;">
+      <div class="entity-header"><span class="icon">🩺</span><h3>Symptom Input</h3></div>
+      <div class="entity-attrs">
+        <div class="attr attr-pk"><span class="badge badge-pk">PK</span>SymptomInputID</div>
+        <div class="attr attr-fk"><span class="badge badge-fk">FK</span>SessionID</div>
+        <div class="attr">SymptomText</div>
+      </div>
+    </div>
+
+    <!-- 7. Side Effect Monitor -->
+    <div class="entity e-red" id="e-sideeffectmonitor" style="left:40px;top:690px;">
+      <div class="entity-header"><span class="icon">🔴</span><h3>Side Effect Monitor</h3></div>
+      <div class="entity-attrs">
+        <div class="attr attr-pk"><span class="badge badge-pk">PK</span>SideEffectID</div>
+        <div class="attr attr-fk"><span class="badge badge-fk">FK</span>SessionID</div>
+        <div class="attr attr-fk"><span class="badge badge-fk">FK</span>MedicineID</div>
+        <div class="attr">SeverityLevel</div>
+      </div>
+    </div>
+
+    <!-- 8. Risk Assessment -->
+    <div class="entity e-pink" id="e-riskassessment" style="left:380px;top:790px;">
+      <div class="entity-header"><span class="icon">📊</span><h3>Risk Assessment</h3></div>
+      <div class="entity-attrs">
+        <div class="attr attr-pk"><span class="badge badge-pk">PK</span>RiskID</div>
+        <div class="attr attr-fk"><span class="badge badge-fk">FK</span>SessionID</div>
+        <div class="attr">RiskScore</div>
+        <div class="attr">RiskLevel</div>
+      </div>
+    </div>
+
+    <!-- 9. AI Explanation -->
+    <div class="entity e-cyan" id="e-aiexplanation" style="left:820px;top:790px;">
+      <div class="entity-header"><span class="icon">🤖</span><h3>AI Explanation</h3></div>
+      <div class="entity-attrs">
+        <div class="attr attr-pk"><span class="badge badge-pk">PK</span>ExplanationID</div>
+        <div class="attr attr-fk"><span class="badge badge-fk">FK</span>SessionID</div>
+        <div class="attr">ModuleType</div>
+        <div class="attr">ExplanationText</div>
+      </div>
+    </div>
+
+    <!-- 10. Log Entry -->
+    <div class="entity e-lime" id="e-logentry" style="left:1200px;top:690px;">
+      <div class="entity-header"><span class="icon">📝</span><h3>Log Entry</h3></div>
+      <div class="entity-attrs">
+        <div class="attr attr-pk"><span class="badge badge-pk">PK</span>LogID</div>
+        <div class="attr attr-fk"><span class="badge badge-fk">FK</span>SessionID</div>
+        <div class="attr">ActionType</div>
+        <div class="attr">Timestamp</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<footer class="page-footer">
+  MedSafe AI &nbsp;·&nbsp; ER Diagram &nbsp;·&nbsp; 10 Entities &nbsp;·&nbsp; Normalized 3NF Structure &nbsp;·&nbsp; 1:N Cardinality
+</footer>
+
+<script>
+  function getPos(el) {
+    const r  = el.getBoundingClientRect();
+    const cr = document.getElementById('canvas').getBoundingClientRect();
+    return {
+      x: r.left - cr.left + r.width  / 2,
+      y: r.top  - cr.top  + r.height / 2,
+      left:   r.left   - cr.left,
+      right:  r.right  - cr.left,
+      top:    r.top    - cr.top,
+      bottom: r.bottom - cr.top,
+      w: r.width,
+      h: r.height
+    };
+  }
+
+  function edgePoints(a, b) {
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    let x1, y1, x2, y2;
+    if (Math.abs(dx) >= Math.abs(dy)) {
+      x1 = dx > 0 ? a.right : a.left;
+      x2 = dx > 0 ? b.left  : b.right;
+      y1 = a.y; y2 = b.y;
+    } else {
+      y1 = dy > 0 ? a.bottom : a.top;
+      y2 = dy > 0 ? b.top    : b.bottom;
+      x1 = a.x; x2 = b.x;
+    }
+    return { x1, y1, x2, y2 };
+  }
+
+  function drawRel(svg, x1, y1, x2, y2, color) {
+    const g  = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    const mx = (x1 + x2) / 2;
+
+    // Bezier path
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', color);
+    path.setAttribute('stroke-width', '1.8');
+    path.setAttribute('stroke-dasharray', '6,3');
+    path.setAttribute('opacity', '0.8');
+    g.appendChild(path);
+
+    // "1" label near source
+    const dx = x2 - x1, dy = y2 - y1;
+    const labelOffX = Math.abs(dx) >= Math.abs(dy) ? (dx > 0 ? -16 : 12) : 6;
+    const labelOffY = Math.abs(dx) >= Math.abs(dy) ? -10  : (dy > 0 ? -12 : 12);
+
+    const t1 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    t1.setAttribute('x', x1 + labelOffX);
+    t1.setAttribute('y', y1 + labelOffY);
+    t1.setAttribute('fill', '#94a3b8');
+    t1.setAttribute('font-size', '11');
+    t1.setAttribute('font-family', 'JetBrains Mono, monospace');
+    t1.setAttribute('font-weight', '600');
+    t1.textContent = '1';
+    g.appendChild(t1);
+
+    // Crow's foot at destination
+    const angle   = Math.atan2(y2 - y1, x2 - x1);
+    const footLen = 12;
+    const spread  = 0.38;
+
+    [[angle - spread], [angle + spread]].forEach(([a]) => {
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', x2 - footLen * Math.cos(a));
+      line.setAttribute('y1', y2 - footLen * Math.sin(a));
+      line.setAttribute('x2', x2);
+      line.setAttribute('y2', y2);
+      line.setAttribute('stroke', color);
+      line.setAttribute('stroke-width', '1.8');
+      g.appendChild(line);
+    });
+
+    // "N" label near destination
+    const nOffX = Math.abs(dx) >= Math.abs(dy) ? (dx > 0 ? 8 : -18) : 6;
+    const nOffY = Math.abs(dx) >= Math.abs(dy) ? -10 : (dy > 0 ? 16 : -12);
+
+    const tN = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    tN.setAttribute('x', x2 + nOffX);
+    tN.setAttribute('y', y2 + nOffY);
+    tN.setAttribute('fill', '#94a3b8');
+    tN.setAttribute('font-size', '11');
+    tN.setAttribute('font-family', 'JetBrains Mono, monospace');
+    tN.setAttribute('font-weight', '600');
+    tN.textContent = 'N';
+    g.appendChild(tN);
+
+    svg.appendChild(g);
+  }
+
+  const rels = [
+    { from: 'e-userprofile',       to: 'e-usersession',       color: '#60a5fa' },
+    { from: 'e-userprofile',       to: 'e-prescriptionocr',   color: '#2dd4bf' },
+    { from: 'e-medicineitem',      to: 'e-usersession',       color: '#4ade80' },
+    { from: 'e-usersession',       to: 'e-interactioncheck',  color: '#fb923c' },
+    { from: 'e-usersession',       to: 'e-symptominput',      color: '#fbbf24' },
+    { from: 'e-usersession',       to: 'e-sideeffectmonitor', color: '#f87171' },
+    { from: 'e-usersession',       to: 'e-riskassessment',    color: '#f472b6' },
+    { from: 'e-usersession',       to: 'e-aiexplanation',     color: '#22d3ee' },
+    { from: 'e-usersession',       to: 'e-logentry',          color: '#a3e635' },
+    { from: 'e-medicineitem',      to: 'e-interactioncheck',  color: '#fdba74' },
+    { from: 'e-medicineitem',      to: 'e-sideeffectmonitor', color: '#fca5a5' },
+  ];
+
+  window.addEventListener('load', () => {
+    const svg = document.getElementById('svg-lines');
+    rels.forEach(r => {
+      const a = getPos(document.getElementById(r.from));
+      const b = getPos(document.getElementById(r.to));
+      const { x1, y1, x2, y2 } = edgePoints(a, b);
+      drawRel(svg, x1, y1, x2, y2, r.color);
+    });
+  });
+
+  // Tooltip
+  const info = {
+    'e-userprofile':       { name: 'User Profile',         desc: 'Patient demographics and medical history. Root identity entity.' },
+    'e-usersession':       { name: 'User Session',          desc: 'Central hub tracking each healthcare session and linking all modules.' },
+    'e-prescriptionocr':   { name: 'Prescription OCR',      desc: 'Holds OCR-extracted text and parsed medicines from uploaded prescriptions.' },
+    'e-medicineitem':      { name: 'Medicine Item',          desc: 'Drug catalogue with salt composition and therapeutic category.' },
+    'e-interactioncheck':  { name: 'Interaction Check',      desc: 'Detects drug-drug interactions between two medicines in a session.' },
+    'e-symptominput':      { name: 'Symptom Input',          desc: 'Free-text symptom descriptions reported during a session.' },
+    'e-sideeffectmonitor': { name: 'Side Effect Monitor',    desc: 'Tracks severity of side effects for a specific drug in a session.' },
+    'e-riskassessment':    { name: 'Risk Assessment',         desc: 'AI-computed risk score and level for a healthcare session.' },
+    'e-aiexplanation':     { name: 'AI Explanation',          desc: 'Natural-language explanations generated by AI for various modules.' },
+    'e-logentry':          { name: 'Log Entry',               desc: 'Audit trail recording every action in a session for traceability.' },
+  };
+
+  const tooltip = document.getElementById('tooltip');
+  document.querySelectorAll('.entity').forEach(el => {
+    el.addEventListener('mousemove', e => {
+      const d = info[el.id];
+      if (!d) return;
+      tooltip.innerHTML = `<h4>${d.name}</h4><p>${d.desc}</p>`;
+      tooltip.style.left    = (e.clientX + 14) + 'px';
+      tooltip.style.top     = (e.clientY - 10) + 'px';
+      tooltip.style.opacity = '1';
+    });
+    el.addEventListener('mouseleave', () => { tooltip.style.opacity = '0'; });
+  });
+</script>
+</body>
+</html>

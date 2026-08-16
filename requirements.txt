@@ -1,0 +1,9 @@
+# MedSafe AI — Project Requirements
+# Note: Tesseract-OCR is a required external system dependency.
+# On Windows, install Tesseract-OCR from: https://github.com/UB-Mannheim/tesseract/wiki
+
+streamlit>=1.30.0
+pillow>=10.0.0
+pytesseract>=0.3.10
+rapidfuzz>=3.0.0
+ollama>=0.1.0

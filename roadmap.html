@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MedSafe AI — Project Roadmap</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:       #07090f;
+      --surface:  #0d1117;
+      --card:     #111827;
+      --border:   #1f2d45;
+      --text:     #e2eaf8;
+      --muted:    #5b7394;
+      --accent1:  #3b82f6;
+      --accent2:  #8b5cf6;
+      --accent3:  #06b6d4;
+      --accent4:  #10b981;
+
+      --e1: #3b82f6;
+      --e2: #f97316;
+      --e3: #8b5cf6;
+      --e4: #10b981;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(135deg, #0d1117 0%, #0f172a 50%, #0d1117 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 52px 60px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -80px; left: -80px;
+      width: 360px; height: 360px;
+      background: radial-gradient(circle, #3b82f615 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -60px; right: -60px;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, #8b5cf610 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #3b82f615; border: 1px solid #3b82f630;
+      color: #60a5fa; border-radius: 100px;
+      padding: 4px 14px; font-size: .72rem; font-weight: 600;
+      letter-spacing: .6px; text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    .hero h1 {
+      font-size: 2.6rem; font-weight: 800; line-height: 1.15;
+      background: linear-gradient(90deg, #e2eaf8 0%, #93c5fd 40%, #c4b5fd 80%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+    }
+    .hero p { color: var(--muted); font-size: .95rem; max-width: 560px; line-height: 1.7; }
+
+    /* ── STATS BAR ── */
+    .stats-bar {
+      display: flex; gap: 0;
+      border-bottom: 1px solid var(--border);
+      background: #0d1117;
+    }
+    .stat {
+      flex: 1; padding: 22px 32px;
+      border-right: 1px solid var(--border);
+      position: relative;
+    }
+    .stat:last-child { border-right: none; }
+    .stat-num {
+      font-size: 2rem; font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      line-height: 1;
+    }
+    .stat-label { color: var(--muted); font-size: .78rem; margin-top: 4px; font-weight: 500; }
+    .stat-bar {
+      position: absolute; bottom: 0; left: 0;
+      height: 3px; border-radius: 0 2px 2px 0;
+      transition: width 1.4s cubic-bezier(.4,0,.2,1);
+    }
+
+    /* ── MAIN LAYOUT ── */
+    .main { padding: 48px 60px; }
+
+    .section-title {
+      font-size: .72rem; font-weight: 700;
+      color: var(--muted); letter-spacing: 1.2px;
+      text-transform: uppercase; margin-bottom: 28px;
+    }
+
+    /* ── EPIC CARD ── */
+    .epic-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+
+    .epic-card {
+      background: var(--card);
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .epic-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 48px rgba(0,0,0,.6);
+    }
+
+    .epic-header {
+      padding: 22px 24px 18px;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+      display: flex; align-items: flex-start; gap: 14px;
+      position: relative; overflow: hidden;
+    }
+    .epic-header::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      opacity: .07;
+    }
+    .epic-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; flex-shrink: 0;
+    }
+    .epic-meta { flex: 1; }
+    .epic-num {
+      font-size: .68rem; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; margin-bottom: 4px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .epic-title {
+      font-size: 1.05rem; font-weight: 700; line-height: 1.3;
+    }
+    .epic-badge {
+      font-size: .62rem; font-weight: 700;
+      padding: 3px 10px; border-radius: 100px;
+      letter-spacing: .5px; text-transform: uppercase;
+      margin-top: 8px; display: inline-block;
+    }
+
+    /* ── PROGRESS ── */
+    .epic-progress { padding: 14px 24px 6px; }
+    .progress-row {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 6px;
+    }
+    .progress-label { font-size: .72rem; color: var(--muted); }
+    .progress-pct   { font-size: .72rem; font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+    .progress-track {
+      height: 5px; background: #1f2d45; border-radius: 100px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%; border-radius: 100px;
+      transition: width 1.6s cubic-bezier(.4,0,.2,1);
+    }
+
+    /* ── STORIES ── */
+    .stories { padding: 8px 24px 22px; display: flex; flex-direction: column; gap: 10px; }
+
+    .story-card {
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex; align-items: flex-start; gap: 12px;
+      transition: border-color .2s, background .2s;
+      cursor: default;
+    }
+    .story-card:hover {
+      background: #111827;
+      border-color: rgba(255,255,255,.1);
+    }
+
+    .story-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .65rem; font-weight: 600;
+      padding: 3px 8px; border-radius: 6px;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .story-text {
+      font-size: .82rem; color: #c8d6f0; line-height: 1.55; flex: 1;
+    }
+    .story-status {
+      flex-shrink: 0;
+      width: 20px; height: 20px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .7rem; margin-top: 1px;
+    }
+
+    /* ── EPIC COLORS ── */
+    /* Epic 1 – Blue */
+    .epic-1 .epic-header::before { background: var(--e1); }
+    .epic-1 .epic-icon           { background: #3b82f620; }
+    .epic-1 .epic-num            { color: #60a5fa; }
+    .epic-1 .epic-badge          { background: #3b82f615; color: #60a5fa; border: 1px solid #3b82f630; }
+    .epic-1 .progress-pct        { color: #60a5fa; }
+    .epic-1 .progress-fill       { background: linear-gradient(90deg, #2563eb, #60a5fa); }
+    .epic-1 .story-num           { background: #3b82f615; color: #93c5fd; }
+    .epic-1 .story-status        { background: #3b82f620; color: #60a5fa; }
+
+    /* Epic 2 – Orange */
+    .epic-2 .epic-header::before { background: var(--e2); }
+    .epic-2 .epic-icon           { background: #f9731620; }
+    .epic-2 .epic-num            { color: #fb923c; }
+    .epic-2 .epic-badge          { background: #f9731615; color: #fb923c; border: 1px solid #f9731630; }
+    .epic-2 .progress-pct        { color: #fb923c; }
+    .epic-2 .progress-fill       { background: linear-gradient(90deg, #ea580c, #fb923c); }
+    .epic-2 .story-num           { background: #f9731615; color: #fdba74; }
+    .epic-2 .story-status        { background: #f9731620; color: #fb923c; }
+
+    /* Epic 3 – Purple */
+    .epic-3 .epic-header::before { background: var(--e3); }
+    .epic-3 .epic-icon           { background: #8b5cf620; }
+    .epic-3 .epic-num            { color: #a78bfa; }
+    .epic-3 .epic-badge          { background: #8b5cf615; color: #a78bfa; border: 1px solid #8b5cf630; }
+    .epic-3 .progress-pct        { color: #a78bfa; }
+    .epic-3 .progress-fill       { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+    .epic-3 .story-num           { background: #8b5cf615; color: #c4b5fd; }
+    .epic-3 .story-status        { background: #8b5cf620; color: #a78bfa; }
+
+    /* Epic 4 – Green */
+    .epic-4 .epic-header::before { background: var(--e4); }
+    .epic-4 .epic-icon           { background: #10b98120; }
+    .epic-4 .epic-num            { color: #34d399; }
+    .epic-4 .epic-badge          { background: #10b98115; color: #34d399; border: 1px solid #10b98130; }
+    .epic-4 .progress-pct        { color: #34d399; }
+    .epic-4 .progress-fill       { background: linear-gradient(90deg, #059669, #34d399); }
+    .epic-4 .story-num           { background: #10b98115; color: #6ee7b7; }
+    .epic-4 .story-status        { background: #10b98120; color: #34d399; }
+
+    /* ── TIMELINE ── */
+    .timeline-section { margin-top: 52px; }
+    .timeline-title {
+      font-size: .72rem; font-weight: 700;
+      color: var(--muted); letter-spacing: 1.2px;
+      text-transform: uppercase; margin-bottom: 24px;
+    }
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      position: relative;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      top: 28px; left: 10%; right: 10%;
+      height: 2px;
+      background: linear-gradient(90deg, #3b82f6, #f97316, #8b5cf6, #10b981);
+      z-index: 0;
+    }
+    .tl-item {
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center; position: relative; z-index: 1;
+      padding: 0 12px;
+    }
+    .tl-dot {
+      width: 56px; height: 56px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      border: 3px solid var(--bg);
+      margin-bottom: 14px;
+      box-shadow: 0 0 0 1px rgba(255,255,255,.1), 0 8px 24px rgba(0,0,0,.4);
+    }
+    .tl-label {
+      font-size: .72rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .8px;
+      margin-bottom: 6px;
+    }
+    .tl-desc {
+      font-size: .75rem; color: var(--muted); line-height: 1.5;
+    }
+    .tl-1 .tl-dot { background: #3b82f625; border-color: #3b82f650; }
+    .tl-2 .tl-dot { background: #f9731625; border-color: #f9731650; }
+    .tl-3 .tl-dot { background: #8b5cf625; border-color: #8b5cf650; }
+    .tl-4 .tl-dot { background: #10b98125; border-color: #10b98150; }
+    .tl-1 .tl-label { color: #60a5fa; }
+    .tl-2 .tl-label { color: #fb923c; }
+    .tl-3 .tl-label { color: #a78bfa; }
+    .tl-4 .tl-label { color: #34d399; }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center; padding: 28px;
+      color: var(--muted); font-size: .75rem;
+      border-top: 1px solid var(--border);
+      margin-top: 60px;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .epic-grid { grid-template-columns: 1fr; }
+      .timeline  { grid-template-columns: 1fr 1fr; }
+      .hero { padding: 36px 24px 28px; }
+      .main { padding: 32px 24px; }
+      .stats-bar { flex-wrap: wrap; }
+      .stat { flex: 1 1 50%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── HERO ── -->
+<header class="hero">
+  <div class="hero-tag">🏥 MedSafe AI</div>
+  <h1>Project Roadmap</h1>
+  <p>A structured sprint plan across 4 Epics and 12 Stories — covering environment setup, AI engine development, UI implementation, and deployment readiness.</p>
+</header>
+
+<!-- ── STATS BAR ── -->
+<div class="stats-bar">
+  <div class="stat">
+    <div class="stat-num" style="color:#60a5fa;">04</div>
+    <div class="stat-label">Total Epics</div>
+    <div class="stat-bar" style="background:#3b82f6; width:100%;"></div>
+  </div>
+  <div class="stat">
+    <div class="stat-num" style="color:#a78bfa;">12</div>
+    <div class="stat-label">User Stories</div>
+    <div class="stat-bar" style="background:#8b5cf6; width:100%;"></div>
+  </div>
+  <div class="stat">
+    <div class="stat-num" style="color:#fb923c;">04</div>
+    <div class="stat-label">Sprint Phases</div>
+    <div class="stat-bar" style="background:#f97316; width:100%;"></div>
+  </div>
+  <div class="stat">
+    <div class="stat-num" style="color:#34d399;">01</div>
+    <div class="stat-label">Final Deployment</div>
+    <div class="stat-bar" style="background:#10b981; width:100%;"></div>
+  </div>
+</div>
+
+<!-- ── MAIN ── -->
+<main class="main">
+  <div class="section-title">📋 Epics & Stories</div>
+
+  <div class="epic-grid">
+
+    <!-- ── EPIC 1 ── -->
+    <div class="epic-card epic-1">
+      <div class="epic-header">
+        <div class="epic-icon">⚙️</div>
+        <div class="epic-meta">
+          <div class="epic-num">Epic 01</div>
+          <div class="epic-title">Environment Setup &amp; System Integration</div>
+          <span class="epic-badge">Foundation</span>
+        </div>
+      </div>
+      <div class="epic-progress">
+        <div class="progress-row">
+          <span class="progress-label">Stories Progress</span>
+          <span class="progress-pct">3 / 3</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" style="width:100%;"></div>
+        </div>
+      </div>
+      <div class="stories">
+        <div class="story-card">
+          <span class="story-num">S-1.1</span>
+          <span class="story-text">Create the Python environment, install required dependencies, and configure project libraries.</span>
+          <span class="story-status">🐍</span>
+        </div>
+        <div class="story-card">
+          <span class="story-num">S-1.2</span>
+          <span class="story-text">Configure OCR engine, Ollama runtime, and supporting AI components.</span>
+          <span class="story-status">🔧</span>
+        </div>
+        <div class="story-card">
+          <span class="story-num">S-1.3</span>
+          <span class="story-text">Organize the modular project structure and establish system integration workflows.</span>
+          <span class="story-status">🏗️</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── EPIC 2 ── -->
+    <div class="epic-card epic-2">
+      <div class="epic-header">
+        <div class="epic-icon">🤖</div>
+        <div class="epic-meta">
+          <div class="epic-num">Epic 02</div>
+          <div class="epic-title">Medicine Safety &amp; AI Reasoning Engine</div>
+          <span class="epic-badge">Core AI</span>
+        </div>
+      </div>
+      <div class="epic-progress">
+        <div class="progress-row">
+          <span class="progress-label">Stories Progress</span>
+          <span class="progress-pct">3 / 3</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" style="width:100%;"></div>
+        </div>
+      </div>
+      <div class="stories">
+        <div class="story-card">
+          <span class="story-num">S-2.1</span>
+          <span class="story-text">Develop the medicine interaction checker to identify drug conflicts and safety risks.</span>
+          <span class="story-status">💊</span>
+        </div>
+        <div class="story-card">
+          <span class="story-num">S-2.2</span>
+          <span class="story-text">Implement prescription OCR processing and AI-powered prescription analysis.</span>
+          <span class="story-status">📄</span>
+        </div>
+        <div class="story-card">
+          <span class="story-num">S-2.3</span>
+          <span class="story-text">Build symptom analysis, side-effect monitoring, and emergency risk scoring modules.</span>
+          <span class="story-status">⚠️</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── EPIC 3 ── -->
+    <div class="epic-card epic-3">
+      <div class="epic-header">
+        <div class="epic-icon">🎨</div>
+        <div class="epic-meta">
+          <div class="epic-num">Epic 03</div>
+          <div class="epic-title">Streamlit UI &amp; User Interaction</div>
+          <span class="epic-badge">Frontend</span>
+        </div>
+      </div>
+      <div class="epic-progress">
+        <div class="progress-row">
+          <span class="progress-label">Stories Progress</span>
+          <span class="progress-pct">3 / 3</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" style="width:100%;"></div>
+        </div>
+      </div>
+      <div class="stories">
+        <div class="story-card">
+          <span class="story-num">S-3.1</span>
+          <span class="story-text">Design and implement a multi-tab Streamlit dashboard interface.</span>
+          <span class="story-status">🖥️</span>
+        </div>
+        <div class="story-card">
+          <span class="story-num">S-3.2</span>
+          <span class="story-text">Develop user input forms, configuration settings, and session management functionality.</span>
+          <span class="story-status">📝</span>
+        </div>
+        <div class="story-card">
+          <span class="story-num">S-3.3</span>
+          <span class="story-text">Create output visualization modules for medicine interactions, risk levels, and safety recommendations.</span>
+          <span class="story-status">📊</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── EPIC 4 ── -->
+    <div class="epic-card epic-4">
+      <div class="epic-header">
+        <div class="epic-icon">🚀</div>
+        <div class="epic-meta">
+          <div class="epic-num">Epic 04</div>
+          <div class="epic-title">Testing, Optimization &amp; Deployment</div>
+          <span class="epic-badge">Launch</span>
+        </div>
+      </div>
+      <div class="epic-progress">
+        <div class="progress-row">
+          <span class="progress-label">Stories Progress</span>
+          <span class="progress-pct">3 / 3</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" style="width:100%;"></div>
+        </div>
+      </div>
+      <div class="stories">
+        <div class="story-card">
+          <span class="story-num">S-4.1</span>
+          <span class="story-text">Initialize and validate the complete Streamlit application workflow.</span>
+          <span class="story-status">✅</span>
+        </div>
+        <div class="story-card">
+          <span class="story-num">S-4.2</span>
+          <span class="story-text">Perform end-to-end testing of OCR extraction, medicine interaction analysis, symptom guidance, and emergency risk prediction modules.</span>
+          <span class="story-status">🧪</span>
+        </div>
+        <div class="story-card">
+          <span class="story-num">S-4.3</span>
+          <span class="story-text">Optimize application performance, verify AI reasoning accuracy, and prepare the platform for deployment.</span>
+          <span class="story-status">⚡</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /epic-grid -->
+
+  <!-- ── TIMELINE ── -->
+  <div class="timeline-section">
+    <div class="timeline-title">🗓️ Sprint Timeline</div>
+    <div class="timeline">
+      <div class="tl-item tl-1">
+        <div class="tl-dot">⚙️</div>
+        <div class="tl-label">Phase 1 · Epic 1</div>
+        <div class="tl-desc">Environment setup, dependency install, OCR &amp; AI config, project structure</div>
+      </div>
+      <div class="tl-item tl-2">
+        <div class="tl-dot">🤖</div>
+        <div class="tl-label">Phase 2 · Epic 2</div>
+        <div class="tl-desc">Interaction checker, prescription OCR, symptom analysis &amp; risk scoring</div>
+      </div>
+      <div class="tl-item tl-3">
+        <div class="tl-dot">🎨</div>
+        <div class="tl-label">Phase 3 · Epic 3</div>
+        <div class="tl-desc">Multi-tab dashboard, input forms, session management &amp; visualizations</div>
+      </div>
+      <div class="tl-item tl-4">
+        <div class="tl-dot">🚀</div>
+        <div class="tl-label">Phase 4 · Epic 4</div>
+        <div class="tl-desc">End-to-end testing, performance optimization &amp; deployment readiness</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  MedSafe AI &nbsp;·&nbsp; Project Roadmap &nbsp;·&nbsp; 4 Epics &nbsp;·&nbsp; 12 Stories &nbsp;·&nbsp; Agile Sprint Planning
+</footer>
+
+<script>
+  // Animate progress bars on load
+  window.addEventListener('load', () => {
+    document.querySelectorAll('.progress-fill').forEach(bar => {
+      const w = bar.style.width;
+      bar.style.width = '0';
+      setTimeout(() => { bar.style.width = w; }, 200);
+    });
+  });
+</script>
+</body>
+</html>
