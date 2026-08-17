@@ -11,6 +11,59 @@
 
 ---
 
+## 📸 Visual Showcase & Screenshots
+
+Place your screenshot files into the [`assets/screenshots/`](assets/screenshots/) folder using the filenames below to automatically render them in this README!
+
+### 1. 🏥 Dashboard Overview & System Status
+> *Main interface displaying system status for Tesseract OCR and Ollama AI connection.*
+
+![MedSafe AI Dashboard Overview](assets/screenshots/dashboard_overview.png)
+
+---
+
+### 2. 💊 Medicine Interaction Checker
+> *Pairwise drug-drug interaction detection across multiple medications with RapidFuzz matching & AI safety notes.*
+
+![Medicine Interaction Checker Screenshot](assets/screenshots/interaction_checker.png)
+
+---
+
+### 3. 📄 Prescription OCR & AI Parsing
+> *Prescription image upload preview, OCR raw text extraction, and structured medicine/drug salt JSON parsing.*
+
+![Prescription OCR Screenshot](assets/screenshots/prescription_ocr.png)
+
+---
+
+### 4. 🩺 Symptom & Doubt Solver
+> *Rule-based emergency symptom advice expanded with LLaMA3 home remedies, breathing exercises, diet tips, and warning signs.*
+
+![Symptom Solver Screenshot](assets/screenshots/symptom_solver.png)
+
+---
+
+### 5. 🔴 Experience & Side-Effect Monitor
+> *Patient context collection (Age, Gender, Medicines, Dosage, Experience) and educational AI side-effect review.*
+
+![Side-Effect Monitor Screenshot](assets/screenshots/side_effect_monitor.png)
+
+---
+
+### 6. 📊 Emergency Risk Predictor
+> *Numeric emergency risk percentage score ($10\%$ to $100\%$) mapped to visual severity alert levels (Level 7 Critical, Level 5 High, Level 1 Minimal).*
+
+![Emergency Risk Predictor Screenshot](assets/screenshots/risk_predictor.png)
+
+---
+
+### 7. 🧪 Automated Unit Test Suite Output
+> *Execution of 8 automated unit tests verifying pairwise checking, fuzzy matching, symptom triage, and fallback paths.*
+
+![Automated Unit Test Results Screenshot](assets/screenshots/unit_tests.png)
+
+---
+
 ## 🌟 Key Features
 
 | Tab | Feature | Technical Capability |
@@ -35,7 +88,16 @@ c:\Users\kolan\OneDrive\Desktop\med\
 ├── er_diagram.html       # Interactive 10-Entity Entity-Relationship Diagram
 ├── roadmap.html          # Interactive Project Roadmap (4 Epics, 12 Stories)
 ├── walkthrough.md        # Detailed feature test verification report
-└── README.md             # Project documentation & setup guide
+├── README.md             # Project documentation & setup guide
+└── assets/
+    └── screenshots/      # Application screenshots folder
+        ├── dashboard_overview.png
+        ├── interaction_checker.png
+        ├── prescription_ocr.png
+        ├── symptom_solver.png
+        ├── side_effect_monitor.png
+        ├── risk_predictor.png
+        └── unit_tests.png
 ```
 
 ---
