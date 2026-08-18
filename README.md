@@ -11,6 +11,14 @@
 
 ---
 
+## 🎥 Project Demo Video
+
+Watch the full platform walkthrough and live workflow demonstration:
+
+[▶️ Watch Project Demo Video (`video demo.mp4`)](video%20demo.mp4)
+
+---
+
 ## 📸 Visual Showcase & Screenshots
 
 Place your screenshot files into the [`assets/screenshots/`](assets/screenshots/) folder using the filenames below to automatically render them in this README!
@@ -85,6 +93,7 @@ c:\Users\kolan\OneDrive\Desktop\med\
 ├── symptom.py            # Rule-based symptom advice, side-effect monitor & risk calculator
 ├── test_medsafe.py       # Automated unit test suite (8 test cases)
 ├── requirements.txt      # Pinned Python package dependencies & Tesseract setup note
+├── video demo.mp4        # Project demonstration video (Git LFS tracked)
 ├── er_diagram.html       # Interactive 10-Entity Entity-Relationship Diagram
 ├── roadmap.html          # Interactive Project Roadmap (4 Epics, 12 Stories)
 ├── walkthrough.md        # Detailed feature test verification report
