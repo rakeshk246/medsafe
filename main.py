@@ -1,13 +1,13 @@
 """
 main.py — MedSafe AI (Intelligent Medicine Safety Assistant)
-Upgraded with robust OCR fallback, configurable Tesseract path, unique Streamlit keys, empty default inputs, and system status indicators.
+Upgraded with noise filtering: ignores short OCR artifact words (< 4 chars) and uses high cutoff threshold (90%) for rule-based drug matching.
 """
 
 import os
 import json
 import shutil
 import streamlit as st
-from PIL import Image
+from PIL import Image, ImageEnhance
 import pytesseract
 from ollama import Client
 
@@ -34,7 +34,6 @@ else:
 OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "LLaMA3")
 try:
     ollama = Client()
-    # Test ping connection
     OLLAMA_STATUS = True
 except Exception:
     ollama = None
@@ -52,7 +51,8 @@ with st.sidebar:
     if TESSERACT_STATUS:
         st.success("✅ Tesseract OCR: Active")
     else:
-        st.warning("⚠️ Tesseract OCR: Not Found (Install Tesseract-OCR)")
+        st.error("❌ Tesseract OCR: Not Installed")
+        st.caption("Install Tesseract-OCR to enable prescription image text extraction.")
         
     if OLLAMA_STATUS:
         st.success(f"✅ Ollama AI ({OLLAMA_MODEL}): Connected")
@@ -61,14 +61,32 @@ with st.sidebar:
 
 
 # ---------------------------------------------------------
-# Helper: Prescription OCR with Rule-Based Fallback
+# Helper: Prescription Image Preprocessing & OCR
 # ---------------------------------------------------------
+def preprocess_image_for_ocr(img):
+    """Enhance image contrast and convert to grayscale for optimal Tesseract OCR text extraction."""
+    gray = img.convert('L')
+    enhancer = ImageEnhance.Contrast(gray)
+    enhanced = enhancer.enhance(2.0)
+    return enhanced
+
+
 def extract_medicines_with_salts(img):
     """
-    Extracts raw text via Tesseract OCR and parses JSON via Ollama or falls back to RapidFuzz matching.
+    Extracts raw text via Tesseract OCR and parses JSON via Ollama or falls back to strict RapidFuzz matching.
     """
+    if not TESSERACT_STATUS:
+        return [], "⚠️ Tesseract OCR is not installed or path not configured. Please install Tesseract-OCR."
+
+    processed_img = preprocess_image_for_ocr(img)
+
+    text = ""
     try:
-        text = pytesseract.image_to_string(img)
+        text = pytesseract.image_to_string(processed_img)
+        if not text.strip():
+            text = pytesseract.image_to_string(img)
+        if not text.strip():
+            text = pytesseract.image_to_string(processed_img, config='--psm 6')
     except Exception as e:
         return [], f"OCR Execution Error: {str(e)}"
 
@@ -101,14 +119,17 @@ Text:
         except Exception:
             data = []
 
-    # Rule-based fallback parsing if LLM JSON is empty
+    # Strict Rule-based fallback: filter out short noise words (< 4 chars) and require high confidence (>= 90.0)
     if not data:
         lines = text.split("\n")
         detected_items = []
         for line in lines:
             for word in line.split():
                 clean_word = "".join(filter(str.isalnum, word))
-                matched_key = find_medicine(clean_word, score_cutoff=85.0)
+                # Ignore short OCR artifacts (e.g. "MET", "aXe", "ae", "oe")
+                if len(clean_word) < 4:
+                    continue
+                matched_key = find_medicine(clean_word, score_cutoff=90.0)
                 if matched_key:
                     med_info = MED_DB[matched_key]
                     item = {"medicine": med_info["name"], "drug": med_info["drug_salt"]}
